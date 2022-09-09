@@ -1,0 +1,37 @@
+import pandas as pd
+import numpy as np
+
+data = pd.read_csv('D:\ML\heart.csv')
+data = data.replace('?',np.nan)
+print('Sample instances from the dataset are given below')
+print(data.head())
+print('\n Attributes and datatypes')
+print(data.dtypes)
+
+
+
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
+model =BayesianModel([('age','heartdisease'),('sex','heartdisease'),
+                      ('exang','heartdisease'),('cp','heartdisease'),
+                      ('heartdisease','restecg'),('heartdisease','chol')])
+import networkx as nx
+import matplotlib.pyplot as plt
+nx.draw(model, with_labels = True); 
+plt.show()
+
+
+
+print('\n Learning CPD using Maximum likelihood estimators')
+model.fit(data,estimator=MaximumLikelihoodEstimator)
+
+
+print('\n Inferencing with Bayesian Network:')
+infer = VariableElimination(model)
+print('\n 1.Probability of HeartDisease given evidence=restecg :1')
+q1=infer.query(variables=['heartdisease'],evidence={'restecg':1})
+print(q1)
+print('\n 2.Probability of HeartDisease given evidence= cp:2 ')
+q2=infer.query(variables=['heartdisease'],evidence={'cp':2})
+print(q2)
